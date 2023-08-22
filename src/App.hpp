@@ -1,8 +1,10 @@
 #pragma once
 #include <AppCore/AppCore.h>
 #include <string_view>
+#include "macros.h"
 
 class TestApp : public ultralight::ViewListener,
+                public ultralight::LoadListener,
                 public ultralight::WindowListener
 {
 public:
@@ -13,8 +15,12 @@ public:
 
     void OnClose(ultralight::Window *) override;
     void OnResize(ultralight::Window *, uint32_t w, uint32_t h) override;
+    void OnDOMReady(ultralight::View *caller, uint64_t frame_id, bool is_main_frame,
+                    const ultralight::String &url) override;
 
 private:
+    void setHeader(const char *header);
+    JSObjectRef getJSFunc(const char *funcName);
     TestApp(const char *title, uint32_t width, uint32_t height);
 
     static TestApp *_instance;
