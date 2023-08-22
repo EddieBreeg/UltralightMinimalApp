@@ -2,6 +2,11 @@
 
 TestApp *TestApp::_instance = nullptr;
 
+#define METHOD_CALLBACK(funcName)                                                                                 \
+    [](JSContextRef ctx, JSObjectRef f, JSObjectRef thisObj, size_t n, const JSValueRef *Args, JSValueRef *exc) { \
+        return TestApp::instance().funcName(ctx, f, thisObj, n, Args, exc);                                       \
+    }
+
 using namespace ultralight;
 
 TestApp::TestApp(const char *title, uint32_t width, uint32_t height)
@@ -32,17 +37,26 @@ void TestApp::OnDOMReady(ultralight::View *caller, uint64_t frame_id, bool is_ma
     DEBUG_LOG("Set javascript context");
     auto setHeaderFunc = getJSFunc("setHeader");
 
-    auto hJsStr = JSStringCreateWithUTF8CString("Hello from c++!");
-    const JSValueRef args[] = {JSValueMakeString(ctx, hJsStr)};
+    JSValue str = "Hello from C++!";
+    auto args = (JSValueRef)str;
 
-    JSObjectCallAsFunction(ctx, setHeaderFunc, nullptr, 1, args, nullptr);
+    JSObjectCallAsFunction(ctx, setHeaderFunc, nullptr, 1, &args, nullptr);
+
+    JSString funcName = "OnButton";
+    auto func = JSObjectMakeFunctionWithCallback(ctx, (JSStringRef)funcName, METHOD_CALLBACK(OnButton));
+    JSObjectSetProperty(ctx, JSContextGetGlobalObject(ctx), funcName, func, 0, 0);
 }
 
-JSObjectRef TestApp::getJSFunc(const char *name)
+JSValueRef TestApp::OnButton(JSContextRef ctx, JSObjectRef, JSObjectRef, size_t, const JSValueRef *, JSValueRef *)
+{
+    DEBUG_LOG("Button was clicked");
+    return nullptr;
+}
+
+JSObjectRef TestApp::getJSFunc(const JSString &name)
 {
     auto ctx = GetJSContext();
-    auto nameStr = JSStringCreateWithUTF8CString(name);
-    auto func = JSEvaluateScript(ctx, nameStr, nullptr, nullptr, 1, nullptr);
+    auto func = JSEvaluateScript(ctx, name, nullptr, nullptr, 1, nullptr);
     auto funcObj = JSValueToObject(ctx, func, nullptr);
     return funcObj;
 }

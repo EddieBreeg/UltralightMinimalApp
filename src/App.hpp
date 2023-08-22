@@ -19,8 +19,12 @@ public:
                     const ultralight::String &url) override;
 
 private:
+    JSValueRef OnButton(JSContextRef, JSObjectRef, JSObjectRef, size_t, const JSValueRef *, JSValueRef *);
     void setHeader(const char *header);
-    JSObjectRef getJSFunc(const char *funcName);
+    JSObjectRef getJSFunc(const ultralight::JSString &funcName);
+
+    using MemberCallback = JSValueRef (TestApp::*)(JSContextRef, JSObjectRef, JSObjectRef, size_t, const JSValueRef *, JSValueRef *);
+
     TestApp(const char *title, uint32_t width, uint32_t height);
 
     static TestApp *_instance;
