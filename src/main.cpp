@@ -12,7 +12,7 @@
 		std::cerr << e.what() << '\n'; \
 	}
 #else
-#define TRY_OR_LOG(expr) (void *)0
+#define TRY_OR_LOG(expr) expr
 #endif
 
 int main()
