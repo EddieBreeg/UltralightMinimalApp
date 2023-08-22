@@ -5,15 +5,12 @@
 #include <iostream>
 #include <cassert>
 
-#define TRY_OR_LOG(expr)               \
-    try                                \
-    {                                  \
-        expr;                          \
-    }                                  \
-    catch (const std::exception &e)    \
-    {                                  \
-        std::cerr << e.what() << '\n'; \
-    }
+#define TRY_OR_LOG(expr)                                                       \
+	try {                                                                      \
+		expr;                                                                  \
+	} catch (const std::exception &e) {                                        \
+		std::cerr << e.what() << '\n';                                         \
+	}
 
 #define DEBUG_LOG(x) std::cout << x << std::endl
 #else
